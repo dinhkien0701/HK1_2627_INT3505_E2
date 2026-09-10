@@ -1,0 +1,6 @@
+#Không commit các phần này lên
+venv/
+.venv/
+__pycache__/
+.env
+*.log
