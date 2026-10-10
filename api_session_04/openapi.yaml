@@ -1,0 +1,138 @@
+openapi: 3.0.3
+
+info:
+  title: Tasks API
+  version: 1.0.0
+  description: API quản lý task nội bộ.
+
+servers:
+  - url: http://localhost:5000/v1
+
+tags:
+  - name: tasks
+    description: Quản lý task
+
+paths:
+  /tasks:
+    get:
+      tags: [tasks]
+      operationId: listTasks
+      summary: Liệt kê danh sách task
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - $ref: '#/components/parameters/Status'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TaskPage' }
+    post:
+      tags: [tasks]
+      operationId: createTask
+      summary: Tạo task mới
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TaskInput' }
+      responses:
+        '201':
+          description: Tạo thành công
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Task' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /tasks/{taskId}:
+    parameters:
+      - $ref: '#/components/parameters/TaskId'
+    get:
+      tags: [tasks]
+      operationId: getTaskById
+      summary: Lấy chi tiết task
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Task' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [tasks]
+      operationId: patchTask
+      summary: Cập nhật một phần task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TaskInput' }
+      responses:
+        '200':
+          description: Cập nhật thành công
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Task' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [tasks]
+      operationId: deleteTask
+      summary: Xoá task
+      responses:
+        '204': { description: Xoá thành công }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+components:
+  parameters:
+    TaskId:
+      name: taskId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+    Offset:
+      name: offset
+      in: query
+      schema: { type: integer, minimum: 0, default: 0 }
+    Status:
+      name: status
+      in: query
+      schema: { type: string, enum: [open, done] }
+
+  responses:
+    NotFound:
+      description: Không tìm thấy task
+    ValidationError:
+      description: Dữ liệu không hợp lệ
+
+  schemas:
+    Task:
+      type: object
+      required: [id, title, status]
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string, minLength: 1, maxLength: 200 }
+        status: { type: string, enum: [open, done], default: open }
+        priority: { type: string, enum: [low, normal, high], default: normal }
+        dueDate: { type: string, format: date, nullable: true }
+        assigneeId: { type: string, format: uuid, nullable: true }
+    TaskInput:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 200 }
+        status: { type: string, enum: [open, done] }
+        priority: { type: string, enum: [low, normal, high] }
+        dueDate: { type: string, format: date, nullable: true }
+        assigneeId: { type: string, format: uuid, nullable: true }
+    TaskPage:
+      type: object
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/Task' } }
+        total: { type: integer }
+        limit: { type: integer }
+        offset: { type: integer }
