@@ -2,16 +2,6 @@
 
 REST API quản lý task nội bộ, viết theo hướng **design-first**: đặc tả OpenAPI trước, sau đó implement Flask app khớp với đặc tả.
 
-## Cấu trúc repo
-
-.
-├── openapi.yaml          # Đặc tả OpenAPI 3.0.3 (5 endpoints)
-├── app.py                # Flask app: /openapi.json + /docs + 5 endpoints
-├── requirements.txt      # Dependencies
-├── README.md
-└── resources/
-    └── try-it-out.png    # Screenshot Swagger UI với "Try it out"
-
 ## Cài đặt & chạy
 
 pip install -r requirements.txt
@@ -42,22 +32,22 @@ Swagger UI với nút **Try it out** gọi API thật và trả về response 20
 
 ## 2 quyết định thiết kế khó nhất
 
-### 1. PATCH dùng schema TaskInput riêng, không dùng chung với Task
+### 1. PATCH / POST dùng schema TaskInput riêng cho body , không dùng chung schema Task ( dành cho response )
 
 **Vấn đề**
 
-Nếu dùng chung schema Task cho cả response và request body, thì `id` (required trong Task) sẽ bị yêu cầu trong cả POST/PATCH — trong khi `id` phải do server tự sinh và client không được phép gửi.
+Nếu dùng chung schema Task cho cả response và request body, thì `id` (required trong Task) sẽ bị yêu cầu trong cả request — trong khi `id` phải do server tự sinh và client không được phép gửi.
 
 **Quyết định**
 
 Tách ra 3 schema riêng:
 - Task — dùng cho response (có `id`, `status` là required)
-- TaskInput — dùng cho request body của POST (chỉ `title` required)
+- TaskInput — dùng cho request body (chỉ `title` required)  **không cần id**
 - TaskPage — dùng cho response phân trang của GET /tasks
 
 **Đánh đổi**
 
-- Client gửi POST/PATCH không cần lo về `id` — chỉ gửi field cần thiết.
+- Client gửi POST/PATCH ( cần request body)  không cần lo về `id` — chỉ gửi field cần thiết.
 - Swagger UI hiển thị form đúng — không có ô `id` mờ ảo cho client điền.
 - Thêm 1 schema phải maintain. Nếu muốn chặt hơn nữa (POST yêu cầu `title`, PATCH cho phép rỗng), phải tách CreateTaskInput và UpdateTaskInput — nhưng như vậy thêm 2 schema, không cần thiết cho bài tập.
 
