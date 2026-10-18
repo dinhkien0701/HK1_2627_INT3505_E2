@@ -1,0 +1,319 @@
+{
+  "info": {
+    "_postman_id": "e3acfee7-4445-4ad2-b3e7-4de6c80ef36d",
+    "name": "api session 5",
+    "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "59038470",
+    "_collection_link": "https://go.postman.co/collection/59038470-e3acfee7-4445-4ad2-b3e7-4de6c80ef36d?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Test cursor",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/v1/books?strategy=cursor&limit=2&sort=-price_vnd",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5000",
+          "path": [
+            "api",
+            "v1",
+            "books"
+          ],
+          "query": [
+            {
+              "key": "strategy",
+              "value": "cursor"
+            },
+            {
+              "key": "limit",
+              "value": "2"
+            },
+            {
+              "key": "sort",
+              "value": "-price_vnd"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Test cursor",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/books?strategy=cursor&limit=2&sort=-price_vnd",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "books"
+              ],
+              "query": [
+                {
+                  "key": "strategy",
+                  "value": "cursor"
+                },
+                {
+                  "key": "limit",
+                  "value": "2"
+                },
+                {
+                  "key": "sort",
+                  "value": "-price_vnd"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "server",
+              "value": "Werkzeug/3.1.9 Python/3.11.7"
+            },
+            {
+              "key": "date",
+              "value": "Sun, 18 Oct 2026 12:09:44 GMT"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "key": "content-length",
+              "value": "523"
+            },
+            {
+              "key": "connection",
+              "value": "close"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"data\": [\n    {\n      \"category_id\": 1,\n      \"id\": \"book_2\",\n      \"isbn\": \"9780201633610\",\n      \"price_vnd\": 600000,\n      \"stock\": 5,\n      \"title\": \"Design Patterns\"\n    },\n    {\n      \"category_id\": 1,\n      \"id\": \"book_5\",\n      \"isbn\": \"9780134757599\",\n      \"price_vnd\": 550000,\n      \"stock\": 8,\n      \"title\": \"Refactoring\"\n    }\n  ],\n  \"pagination\": {\n    \"has_more\": true,\n    \"limit\": 2,\n    \"next_cursor\": \"eyJzb3J0X3N0ciI6ICItcHJpY2Vfdm5kIiwgInZhbHMiOiBbNTUwMDAwLCA1XX0\",\n    \"strategy\": \"cursor\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Test Offset + Filter + Sort",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/v1/books?strategy=offset&genre=tech&sort=-price_vnd, title&limit=2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5000",
+          "path": [
+            "api",
+            "v1",
+            "books"
+          ],
+          "query": [
+            {
+              "key": "strategy",
+              "value": "offset"
+            },
+            {
+              "key": "genre",
+              "value": "tech"
+            },
+            {
+              "key": "sort",
+              "value": "-price_vnd, title"
+            },
+            {
+              "key": "limit",
+              "value": "2"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Test Offset + Filter + Sort",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/books?strategy=offset&genre=tech&sort=-price_vnd, title&limit=2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "books"
+              ],
+              "query": [
+                {
+                  "key": "strategy",
+                  "value": "offset"
+                },
+                {
+                  "key": "genre",
+                  "value": "tech"
+                },
+                {
+                  "key": "sort",
+                  "value": "-price_vnd, title"
+                },
+                {
+                  "key": "limit",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "server",
+              "value": "Werkzeug/3.1.9 Python/3.11.7"
+            },
+            {
+              "key": "date",
+              "value": "Sun, 18 Oct 2026 12:05:34 GMT"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "key": "content-length",
+              "value": "468"
+            },
+            {
+              "key": "connection",
+              "value": "close"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"data\": [\n    {\n      \"category_id\": 1,\n      \"id\": \"book_2\",\n      \"isbn\": \"9780201633610\",\n      \"price_vnd\": 600000,\n      \"stock\": 5,\n      \"title\": \"Design Patterns\"\n    },\n    {\n      \"category_id\": 1,\n      \"id\": \"book_5\",\n      \"isbn\": \"9780134757599\",\n      \"price_vnd\": 550000,\n      \"stock\": 8,\n      \"title\": \"Refactoring\"\n    }\n  ],\n  \"pagination\": {\n    \"has_next\": true,\n    \"limit\": 2,\n    \"page\": 1,\n    \"strategy\": \"offset\",\n    \"total\": 3\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Test next cursor",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/v1/books?strategy=cursor&limit=2&sort=-price_vnd&cursor=eyJzb3J0X3N0ciI6ICItcHJpY2Vfdm5kIiwgInZhbHMiOiBbNTUwMDAwLCA1XX0",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5000",
+          "path": [
+            "api",
+            "v1",
+            "books"
+          ],
+          "query": [
+            {
+              "key": "strategy",
+              "value": "cursor"
+            },
+            {
+              "key": "limit",
+              "value": "2"
+            },
+            {
+              "key": "sort",
+              "value": "-price_vnd"
+            },
+            {
+              "key": "cursor",
+              "value": "eyJzb3J0X3N0ciI6ICItcHJpY2Vfdm5kIiwgInZhbHMiOiBbNTUwMDAwLCA1XX0"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Test next cursor",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/books?strategy=cursor&limit=2&sort=-price_vnd&cursor=eyJzb3J0X3N0ciI6ICItcHJpY2Vfdm5kIiwgInZhbHMiOiBbNTUwMDAwLCA1XX0",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "books"
+              ],
+              "query": [
+                {
+                  "key": "strategy",
+                  "value": "cursor"
+                },
+                {
+                  "key": "limit",
+                  "value": "2"
+                },
+                {
+                  "key": "sort",
+                  "value": "-price_vnd"
+                },
+                {
+                  "key": "cursor",
+                  "value": "eyJzb3J0X3N0ciI6ICItcHJpY2Vfdm5kIiwgInZhbHMiOiBbNTUwMDAwLCA1XX0"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "server",
+              "value": "Werkzeug/3.1.9 Python/3.11.7"
+            },
+            {
+              "key": "date",
+              "value": "Sun, 18 Oct 2026 12:12:05 GMT"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "key": "content-length",
+              "value": "527"
+            },
+            {
+              "key": "connection",
+              "value": "close"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"data\": [\n    {\n      \"category_id\": 1,\n      \"id\": \"book_1\",\n      \"isbn\": \"9780132350884\",\n      \"price_vnd\": 450000,\n      \"stock\": 10,\n      \"title\": \"Clean Code\"\n    },\n    {\n      \"category_id\": 2,\n      \"id\": \"book_4\",\n      \"isbn\": \"9786049876543\",\n      \"price_vnd\": 90000,\n      \"stock\": 15,\n      \"title\": \"Số đỏ\"\n    }\n  ],\n  \"pagination\": {\n    \"has_more\": true,\n    \"limit\": 2,\n    \"next_cursor\": \"eyJzb3J0X3N0ciI6ICItcHJpY2Vfdm5kIiwgInZhbHMiOiBbOTAwMDAsIDRdfQ\",\n    \"strategy\": \"cursor\"\n  }\n}"
+        }
+      ]
+    }
+  ]
+}
