@@ -2,11 +2,19 @@ openapi: 3.0.3
 info:
   title: Social Network API
   version: 1.0.0
-  description: API cho hệ thống mạng xã hội, áp dụng JWT và phân quyền theo Scope.
+  description: |
+    Tài liệu API cho hệ thống Social Network (Bài tập Buổi 06).
+    Yêu cầu phân quyền bằng JWT (Access Token & Refresh Token) và áp dụng Scope.
 
 servers:
   - url: http://localhost:5000/api/v1
-    description: Local development server
+    description: Development server
+
+tags:
+  - name: Auth
+    description: Các API xác thực (Authentication)
+  - name: Posts
+    description: Các API tương tác với bài viết (Authorization)
 
 components:
   securitySchemes:
@@ -14,7 +22,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: "Nhập Access Token (cho /posts) hoặc Refresh Token (cho /auth/refresh)"
+      description: "Truyền Access Token (cho /posts) hoặc Refresh Token (cho /auth/refresh)"
 
   schemas:
     LoginRequest:
@@ -24,25 +32,25 @@ components:
         email:
           type: string
           format: email
-          example: an@vnu.edu.vn
+          example: "an@vnu.edu.vn"
         password:
           type: string
           format: password
           example: "secret123"
-    
+
     TokenResponse:
       type: object
       properties:
         access_token:
           type: string
-          description: JWT Access Token (hết hạn sau 15 phút)
+          description: "JWT Access Token (hết hạn sau 15 phút), chứa claims và scopes"
         refresh_token:
           type: string
-          description: JWT Refresh Token (hết hạn sau 30 ngày)
+          description: "JWT Refresh Token (hết hạn sau 30 ngày)"
         token_type:
           type: string
           example: "Bearer"
-    
+
     PostResponse:
       type: object
       properties:
@@ -51,33 +59,33 @@ components:
           example: "post_42"
         title:
           type: string
-          example: "Học SOA buổi 6"
+          example: "Lộ trình học Backend"
         content:
           type: string
-          example: "Nội dung về JWT và OAuth 2.0"
+          example: "Nội dung chi tiết..."
         author_id:
           type: string
           example: "user_1"
-        created_at:
-          type: string
-          format: date-time
-    
+
     ErrorResponse:
       type: object
       properties:
         error:
           type: string
-          example: "invalid_credentials"
+          example: "invalid_request"
         message:
           type: string
-          example: "Email hoặc mật khẩu không chính xác"
+          example: "Chi tiết lỗi"
 
 paths:
   /auth/login:
     post:
       tags: [Auth]
       summary: Đăng nhập để lấy Access Token và Refresh Token
-      security: [] # Public endpoint, không cần token
+      description: |
+        **Scope yêu cầu:** Không (Public API).
+        **Lỗi có thể xảy ra:** 400 (Sai định dạng), 401 (Sai thông tin đăng nhập), 429 (Brute-force).
+      security: []
       requestBody:
         required: true
         content:
@@ -86,25 +94,25 @@ paths:
               $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: Đăng nhập thành công
+          description: Đăng nhập thành công, trả về bộ đôi token.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenResponse'
         '400':
-          description: Dữ liệu đầu vào không hợp lệ
+          description: Dữ liệu đầu vào không hợp lệ (thiếu email/password).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Sai email hoặc mật khẩu (Thông báo lỗi chung để tránh dò tài khoản)
+          description: Sai email hoặc mật khẩu (Lỗi chung để tránh dò tài khoản).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '429':
-          description: Quá nhiều yêu cầu (Rate Limit để chống Brute-force)
+          description: Quá nhiều yêu cầu (Rate limit).
           content:
             application/json:
               schema:
@@ -113,24 +121,27 @@ paths:
   /auth/refresh:
     post:
       tags: [Auth]
-      summary: Làm mới Access Token bằng Refresh Token
+      summary: Làm mới Access Token
+      description: |
+        **Scope yêu cầu:** Không cần scope cụ thể, chỉ cần Refresh Token hợp lệ.
+        **Lỗi có thể xảy ra:** 401 (Token hết hạn/sai), 403 (Token bị thu hồi trong blocklist/Redis).
       security:
-        - bearerAuth: [] # Yêu cầu gửi kèm Refresh Token trong header
+        - bearerAuth: [] # Yêu cầu truyền Refresh Token
       responses:
         '200':
-          description: Cấp mới Access Token thành công
+          description: Cấp mới Access Token thành công.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenResponse'
         '401':
-          description: Refresh Token không hợp lệ hoặc đã hết hạn
+          description: Refresh Token không hợp lệ hoặc đã hết hạn.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '403':
-          description: Token bị thu hồi (Revoked) hoặc không có quyền
+          description: Refresh Token hợp lệ nhưng đã bị thu hồi (Revoked).
           content:
             application/json:
               schema:
@@ -140,8 +151,11 @@ paths:
     get:
       tags: [Posts]
       summary: Lấy thông tin chi tiết bài viết
+      description: |
+        **Scope yêu cầu:** `posts:read` (phải nằm trong Access Token).
+        **Lỗi có thể xảy ra:** 401 (Thiếu/sai Token), 403 (Thiếu scope hoặc BOLA - không phải chủ sở hữu), 404 (Không tìm thấy).
       security:
-        - bearerAuth: [] # Yêu cầu Access Token hợp lệ
+        - bearerAuth: [] # Yêu cầu truyền Access Token
       parameters:
         - name: id
           in: path
@@ -151,25 +165,25 @@ paths:
           description: ID của bài viết (VD - post_42)
       responses:
         '200':
-          description: Lấy bài viết thành công
+          description: Lấy bài viết thành công.
           content:
             application/json:
               schema:
-              $ref: '#/components/schemas/PostResponse'
+                $ref: '#/components/schemas/PostResponse'
         '401':
-          description: Thiếu Token hoặc Token không hợp lệ/hết hạn
+          description: Thiếu Access Token hoặc Token hết hạn/không hợp lệ.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '403':
-          description: Token hợp lệ nhưng thiếu quyền (Scope) hoặc không có quyền truy cập bài viết (BOLA)
+          description: Token thiếu scope `posts:read` HOẶC vi phạm BOLA (không có quyền xem bài viết private của người khác).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: Bài viết không tồn tại
+          description: Không tìm thấy bài viết.
           content:
             application/json:
               schema:
