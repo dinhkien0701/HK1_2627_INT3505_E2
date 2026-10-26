@@ -1,0 +1,176 @@
+openapi: 3.0.3
+info:
+  title: Social Network API
+  version: 1.0.0
+  description: API cho hệ thống mạng xã hội, áp dụng JWT và phân quyền theo Scope.
+
+servers:
+  - url: http://localhost:5000/api/v1
+    description: Local development server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Nhập Access Token (cho /posts) hoặc Refresh Token (cho /auth/refresh)"
+
+  schemas:
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: an@vnu.edu.vn
+        password:
+          type: string
+          format: password
+          example: "secret123"
+    
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: JWT Access Token (hết hạn sau 15 phút)
+        refresh_token:
+          type: string
+          description: JWT Refresh Token (hết hạn sau 30 ngày)
+        token_type:
+          type: string
+          example: "Bearer"
+    
+    PostResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "post_42"
+        title:
+          type: string
+          example: "Học SOA buổi 6"
+        content:
+          type: string
+          example: "Nội dung về JWT và OAuth 2.0"
+        author_id:
+          type: string
+          example: "user_1"
+        created_at:
+          type: string
+          format: date-time
+    
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "invalid_credentials"
+        message:
+          type: string
+          example: "Email hoặc mật khẩu không chính xác"
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Đăng nhập để lấy Access Token và Refresh Token
+      security: [] # Public endpoint, không cần token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: Dữ liệu đầu vào không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Sai email hoặc mật khẩu (Thông báo lỗi chung để tránh dò tài khoản)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Quá nhiều yêu cầu (Rate Limit để chống Brute-force)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Làm mới Access Token bằng Refresh Token
+      security:
+        - bearerAuth: [] # Yêu cầu gửi kèm Refresh Token trong header
+      responses:
+        '200':
+          description: Cấp mới Access Token thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: Refresh Token không hợp lệ hoặc đã hết hạn
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Token bị thu hồi (Revoked) hoặc không có quyền
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /posts/{id}:
+    get:
+      tags: [Posts]
+      summary: Lấy thông tin chi tiết bài viết
+      security:
+        - bearerAuth: [] # Yêu cầu Access Token hợp lệ
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID của bài viết (VD - post_42)
+      responses:
+        '200':
+          description: Lấy bài viết thành công
+          content:
+            application/json:
+              schema:
+              $ref: '#/components/schemas/PostResponse'
+        '401':
+          description: Thiếu Token hoặc Token không hợp lệ/hết hạn
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Token hợp lệ nhưng thiếu quyền (Scope) hoặc không có quyền truy cập bài viết (BOLA)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Bài viết không tồn tại
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
