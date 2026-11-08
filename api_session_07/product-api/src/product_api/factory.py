@@ -3,7 +3,8 @@ from flask import Flask, jsonify
 from .extensions import db, migrate
 from .config import DefaultConfig
 from .api.products import products_bp
-from .api.errors import ApiError # Import thêm cái này
+from .api.orders import orders_bp
+from .api.errors import ApiError 
 
 def create_app(config_class=DefaultConfig):
     # bọc app=flask vào hàm để có thể tạo nhiều app với các config khác nhau
@@ -15,6 +16,7 @@ def create_app(config_class=DefaultConfig):
     migrate.init_app(app, db)
     
     app.register_blueprint(products_bp)
+    app.register_blueprint(orders_bp)
 
     # bắt lỗi tự động
     @app.errorhandler(ApiError)

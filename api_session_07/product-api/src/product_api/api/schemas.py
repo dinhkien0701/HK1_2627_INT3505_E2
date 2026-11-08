@@ -29,3 +29,24 @@ class ProductPatch(Schema):
 # 4. Dùng cho endpoint Reserve (Đặt hàng)
 class ReserveIn(Schema):
     qty = fields.Int(required=True, validate=validate.Range(min=1))
+
+
+
+# Bài tập 2 #
+
+# --- SCHEMAS CHO ORDER ---
+class OrderItemIn(Schema):
+    product_id = fields.Int(required=True)
+    quantity = fields.Int(required=True, validate=validate.Range(min=1))
+
+class OrderIn(Schema):
+    items = fields.List(fields.Nested(OrderItemIn), required=True)
+
+class OrderItemOut(Schema):
+    product_id = fields.Int()
+    quantity = fields.Int()
+
+class OrderOut(Schema):
+    id = fields.Int()
+    created_at = fields.DateTime()
+    items = fields.List(fields.Nested(OrderItemOut))
