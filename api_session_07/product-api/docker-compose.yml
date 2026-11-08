@@ -1,0 +1,31 @@
+#Bai 3 #
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: devpw
+      POSTGRES_DB: appdb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d appdb"]
+      interval: 5s
+      retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    build: .
+    environment:
+      # Kết nối tới container db (host là 'db', không phải localhost)
+      DB_URL: postgresql+psycopg2://app:devpw@db/appdb
+      SECRET_KEY: "dev-secret-in-docker"
+    depends_on:
+      db:
+        condition: service_healthy # Đợi DB sẵn sàng rồi mới chạy API
+    ports:
+      - "5000:5000"
+
+volumes:
+  pgdata:
