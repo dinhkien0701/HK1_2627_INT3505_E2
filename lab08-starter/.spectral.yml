@@ -1,0 +1,24 @@
+extends: spectral:oas
+
+functionsDir: .spectral-functions
+functions:
+  - response-200-schema
+
+rules:
+  response-204-no-content:
+    description: A 204 response must not declare response content.
+    severity: error
+    given: "$.paths[*][*].responses['204']"
+    then:
+      function: response-200-schema
+      functionOptions:
+        requireContent: false
+
+  response-200-has-schema:
+    description: A 200 response must declare a non-empty JSON schema.
+    severity: error
+    given: "$.paths[*][*].responses['200']"
+    then:
+      function: response-200-schema
+      functionOptions:
+        requireContent: true
