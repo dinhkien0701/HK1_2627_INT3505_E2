@@ -1,7 +1,7 @@
-"""Lab 4 starter: weighted tasks, optional 404, no deliberate server errors.
+"""Lab 4 load test: weighted tasks, optional 404, and a client-side 1% failure.
 
 Run: locust -f performance/locustfile.py --headless -H http://127.0.0.1:5000 \
-         -u 10 -r 2 -t 30s --html reports/A.html
+         -u 10 -r 2 -t 30s --html reports/A.html --csv reports/A
 """
 import itertools
 import random
