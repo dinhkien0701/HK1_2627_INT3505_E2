@@ -89,14 +89,19 @@ Lưu ý: cần chạy server trước. `data.csv` là dữ liệu ví dụ để
 ```bash
 mkdir -p reports
 locust -f performance/locustfile.py --headless -H http://127.0.0.1:5000 \
-  -u 10 -r 2 -t 30s --html reports/A.html
+  -u 10 -r 2 -t 30s --html reports/A.html --csv reports/A
 locust -f performance/locustfile.py --headless -H http://127.0.0.1:5000 \
-  -u 50 -r 5 -t 60s --html reports/B.html
+  -u 50 -r 5 -t 60s --html reports/B.html --csv reports/B
 locust -f performance/locustfile.py --headless -H http://127.0.0.1:5000 \
-  -u 200 -r 50 -t 30s --html reports/C.html
+  -u 200 -r 50 -t 30s --html reports/C.html --csv reports/C
 ```
 
-Hoàn thiện TODO `search_by_year` và nếu tạo 1% failure giả lập, **ghi rõ** đó là HTTP 500 do server phát hay client-side `response.failure()` của Locust. Điền `performance/analysis.md` bằng kết quả **đo thực tế**; báo cáo p95, failure rate, RPS, nhận xét giới hạn phép đo. Load test chạy Flask development server + SQLite chỉ có ý nghĩa thực hành, không thể khẳng định SLO production.
+Mỗi lệnh tạo một báo cáo HTML và các file CSV thống kê tương ứng (`reports/A_stats.csv`,
+`reports/B_stats.csv`, `reports/C_stats.csv`). Task `search_by_year` có 1% failure
+giả lập bằng `response.failure()` phía client Locust; đây không phải HTTP 500 do server
+Flask phát. Điền `performance/analysis.md` bằng kết quả **đo thực tế**; báo cáo p95,
+failure rate, RPS và nhận xét giới hạn phép đo. Load test chạy Flask development server
++ SQLite chỉ có ý nghĩa thực hành, không thể khẳng định SLO production.
 
 ## 6. Cấu trúc thư mục
 
