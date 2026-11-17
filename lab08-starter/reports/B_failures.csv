@@ -1,0 +1,2 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+GET,GET /books?year={year},CatchResponseError('Simulated client-side failure (1%)'),2,2026-11-17T10:41:24Z,2026-11-17T10:41:42Z
