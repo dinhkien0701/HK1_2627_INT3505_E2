@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Books API — Lab08 Starter",
-    "description": "Lab 3: add error-cases/ folder with POST missing title and GET missing id. Collection currently contains happy paths only.",
+    "description": "Lab 3: happy paths plus error-cases/ with POST missing title and GET missing id.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -218,7 +218,7 @@
             {
               "listen": "test",
               "script": {
-                "type": "text",
+                "type": "text/javascript",
                 "exec": [
                   "pm.test(\"400 Bad Request\", () => pm.response.to.have.status(400));",
                   "pm.test(\"validation error body\", () => {",
@@ -251,7 +251,7 @@
             {
               "listen": "test",
               "script": {
-                "type": "text",
+                "type": "text/javascript",
                 "exec": [
                   "pm.test(\"404 Not Found\", () => pm.response.to.have.status(404));",
                   "pm.test(\"not found error body\", () => {",
