@@ -1,16 +1,16 @@
-from flask import Flask
-from datetime import datetime, timezone
+from flask import Flask, jsonify, request
 
-from sunset import deprecate_at
+from gateway import dispatch
 
 app = Flask(__name__)
-V1_SUNSET = datetime(2026, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
 
 
-@app.route("/api/v1/users/<int:uid>")
-@deprecate_at(V1_SUNSET, replacement="/api/v2/users")
-def get_v1_user(uid):
-    return {"id": uid, "full_name": "Nguyễn Văn A"}
+@app.route("/orders", methods=["POST"])
+def create_order():
+    which, result = dispatch(request.get_json())
+    response = jsonify(result)
+    response.headers["X-Order-Handler"] = which
+    return response, 201 if which == "v2" else 200
 
 
 if __name__ == "__main__":
